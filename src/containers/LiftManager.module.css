@@ -1,0 +1,10 @@
+.board {
+    height:100%;
+    width:100%;
+    position: relative;
+}
+
+.floor {
+    display: flex;
+    height: 9%;
+}
