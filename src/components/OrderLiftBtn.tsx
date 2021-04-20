@@ -29,14 +29,17 @@ export default function OrderLiftBtn({ data, orderLift,width }: Props) {
   let backgroundColor = "green";
   let borderColor = "transparent";
   let color = "white";
-  if (data.status === "waiting") {
-    backgroundColor = "red";
-    borderColor = "transparent";
-    color = "white";
-  } else if (data.status === "arrived") {
-    backgroundColor = "white";
-    borderColor = "green";
-    color = "green";
+  if(data){
+
+    if (data.status === "waiting") {
+      backgroundColor = "red";
+      borderColor = "transparent";
+      color = "white";
+    } else if (data.status === "arrived") {
+      backgroundColor = "white";
+      borderColor = "green";
+      color = "green";
+    }
   }
 
   return (

@@ -9,12 +9,14 @@
 
 }
 
-
+.header {
+  height: 20%;
+}
 
 .App-header {
   /* background-color: #282c34; */
-  height: 80%;
-  width: 60%;
+  height: 100%;
+  width: 70%;
   font-size: calc(10px + 2vmin);
   color: white;
 }
@@ -23,9 +25,12 @@
 
 @media  (max-width: 600px) {
   .App-header {
-    width: 90%;
-    height: 95%;
-    
+    width: 80%;
+    padding: 5% 2%;
 
+  }
+  .header {
+    height: 10%;
+    margin-bottom: 15%;
   }
 }

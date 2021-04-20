@@ -19,9 +19,14 @@ interface State {
   mat: any[][];
   currentlyMoving: number;
   err: string;
-  intervals: any[];
 }
 
+interface Props {
+  floorsAmount: number;
+  Lifts: number;
+  setFloorsAmount: any;
+  setLifts: any;
+}
 const customStyles = {
   content: {
     top: "10%",
@@ -33,28 +38,44 @@ const customStyles = {
     transform: "translate(-50%, -50%)",
   },
 };
-interface Props {}
+
 export default class LiftManager extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+  }
   state = {
     lifts: liftsArrayCreator(),
     floors: floorsArrayCreator(),
     calls: Array<number>(),
     currentlyMoving: 0,
     err: "",
-    intervals: [],
     mat: createCellsMatrix(),
   };
-  componentDidUpdate(prevProps: any, prevState: State) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    //order waiting lifts
+
     if (
-      //
-      prevState.currentlyMoving === LIFTS &&
-      this.state.currentlyMoving === LIFTS-1 &&
+      prevState.currentlyMoving === this.props.Lifts &&
+      this.state.currentlyMoving === this.props.Lifts - 1 &&
       this.state.calls.length > 0
     ) {
       const calls = this.state.calls.slice(1);
       this.setState({ calls });
       this.orderLift(this.state.calls[0]);
       console.log(prevState);
+    }
+    //change lifts and floors
+    if (
+      prevProps.Lifts !== this.props.Lifts ||
+      prevProps.floorsAmount !== this.props.floorsAmount
+    ) {
+      this.setState({
+        lifts: liftsArrayCreator(this.props.Lifts),
+        floors: floorsArrayCreator(this.props.floorsAmount),
+        calls: Array<number>(),
+        currentlyMoving: 0,
+        mat: createCellsMatrix(this.props.floorsAmount, this.props.Lifts),
+      });
     }
   }
 
@@ -72,6 +93,7 @@ export default class LiftManager extends Component<Props, State> {
     }
     return false;
   };
+
   freeLiftAndFloor = (liftId: number, floorLevel: number) => {
     const lifts = this.state.lifts.slice();
     lifts[liftId] = {
@@ -161,7 +183,7 @@ export default class LiftManager extends Component<Props, State> {
   setTime = (floor: number, lift_id: number, time: number) => {
     console.log(`setTime, floor:[${floor}],lift[${lift_id}],time:${time}`);
     const newMat = JSON.parse(JSON.stringify(this.state.mat));
-    newMat[FLOORS_AMOUNT - 1 - floor][lift_id].time = time;
+    newMat[this.props.floorsAmount - 1 - floor][lift_id].time = time;
     this.setState({ mat: newMat });
   };
 
@@ -174,34 +196,36 @@ export default class LiftManager extends Component<Props, State> {
             key={floorLevel}
             style={{
               backgroundColor: "transparent",
-              height: `${100 / FLOORS_AMOUNT}%`,
+              height: `${100 / this.props.floorsAmount}%`,
             }}
           >
             {row.map((cell) => (
               <FloorCell
-                width={Math.floor(100 / (LIFTS + 1))}
-                height={Math.floor(100 / FLOORS_AMOUNT)}
+                width={Math.floor(100 / (this.props.Lifts + 1))}
+                height={Math.floor(100 / this.props.floorsAmount)}
                 {...cell}
                 setTime={this.setTime}
                 key={`${cell.floorLevel}-${cell.fromTheLeft}`}
               />
             ))}
             <OrderLiftBtn
-              width={Math.floor(100 / (LIFTS + 1))}
-              height={Math.floor(100 / FLOORS_AMOUNT)}
-              data={this.state.floors[FLOORS_AMOUNT - 1 - floorLevel]}
-              orderLift={() => this.orderLift(FLOORS_AMOUNT - 1 - floorLevel)}
+              width={Math.floor(100 / (this.props.Lifts + 1))}
+              height={Math.floor(100 / this.props.floorsAmount)}
+              data={this.state.floors[this.props.floorsAmount - 1 - floorLevel]}
+              orderLift={() =>
+                this.orderLift(this.props.floorsAmount - 1 - floorLevel)
+              }
             />
           </div>
         ))}
         {this.state.lifts.map((lift) => (
           <Lift
             key={lift.id}
-            floorsAmount={FLOORS_AMOUNT}
-            liftsAmount={LIFTS}
+            floorsAmount={this.props.floorsAmount}
+            liftsAmount={this.props.Lifts}
             {...lift}
-            width={Math.floor(100 / (LIFTS + 1))}
-            height={Math.floor(100 / FLOORS_AMOUNT)}
+            width={Math.floor(100 / (this.props.Lifts + 1))}
+            height={Math.floor(100 / this.props.floorsAmount)}
           />
         ))}
         {this.state.err && (

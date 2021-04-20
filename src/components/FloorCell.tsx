@@ -32,7 +32,7 @@ export default function FloorCell(props: Props) {
     // eslint-disable-next-line
   }, [timeVisible]);
 
-  console.log(timeVisible);
+  // console.log(timeVisible);
   
   return (
     <div
