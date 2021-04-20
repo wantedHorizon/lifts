@@ -8,7 +8,6 @@ interface Props {
   setTime: (floor: number, lift_id: number, time: number) => void;
 }
 export default function FloorCell(props: Props) {
-  let interval: null;
   const [timeVisible, setTimeVisible] = useState(-1);
   useEffect(() => {
     if (props.time > 0) {
@@ -28,6 +27,7 @@ export default function FloorCell(props: Props) {
       setTimeVisible(-1);
       props.setTime(props.floorLevel, props.fromTheLeft, 0);
     }
+    // eslint-disable-next-line
   }, [timeVisible]);
 
   console.log(timeVisible);
