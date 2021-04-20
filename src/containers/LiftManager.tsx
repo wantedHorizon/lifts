@@ -222,7 +222,7 @@ export default class LiftManager extends Component<Props, State> {
             liftsAmount={this.props.Lifts}
             {...lift}
             width={Math.floor(100 / (this.props.Lifts + 1))}
-            height={Math.floor(100 / this.props.floorsAmount)}
+            height={(100 / this.props.floorsAmount)}
           />
         ))}
         {this.state.err && (

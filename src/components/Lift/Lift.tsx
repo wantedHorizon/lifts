@@ -41,12 +41,11 @@ export default function Lift({ id,
       style={{
         height:`${height}%`,
         width:`${width}%`,
-        bottom: `${height *floor}%`,
+        bottom: `${height*floor}%`,
         left: `${
           width*id
         }%`,
         transition: `bottom ${Math.abs(from - to)}s`,
-        // backgroundColor:'red'
         // transform:'translate(-50%)'
       }}
     >
