@@ -5,8 +5,7 @@ import OrderLiftBtn from "../components/OrderLiftBtn";
 import classes from "./LiftManager.module.css";
 import Modal from "react-modal";
 import {
-  FLOORS_AMOUNT,
-  LIFTS,
+
   createCellsMatrix,
   floorsArrayCreator,
   liftsArrayCreator,
@@ -40,9 +39,7 @@ const customStyles = {
 };
 
 export default class LiftManager extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-  }
+ 
   state = {
     lifts: liftsArrayCreator(),
     floors: floorsArrayCreator(),
