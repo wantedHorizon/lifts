@@ -21,7 +21,7 @@ export default function Lift(props: Props) {
   return (
     <div
       className="lift"
-      style={{ bottom: `${10 * props.floor}%`, left: `${5 + props.id * 16}%`,transition:`bottom ${Math.abs(props.from-props.to)}s` }}
+      style={{ bottom: `${10 * props.floor}%`, left: `${5 + props.id * 16.5}%`,transition:`bottom ${Math.abs(props.from-props.to)}s` }}
     >
       <img src={icon} alt="lift" />
     </div>

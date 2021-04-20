@@ -3,6 +3,7 @@ import FloorCell from "../components/FloorCell";
 import Lift from "../components/Lift/Lift";
 import OrderLiftBtn from "../components/OrderLiftBtn";
 import classes from "./LiftManager.module.css";
+import Modal from "react-modal";
 const createCellsMatrix = (): any[][] => {
   const mat = [];
   for (let floorLevel = 0; floorLevel < 10; floorLevel++) {
@@ -12,6 +13,7 @@ const createCellsMatrix = (): any[][] => {
         floorLevel,
         fromTheLeft: lifts,
         text: "",
+        time:0
       });
     }
     mat.push(floor);
@@ -24,7 +26,21 @@ interface State {
   calls: number[];
   mat: any[][];
   currentlyMoving: number;
+  err: string;
+  intervals:any[];
 }
+
+const customStyles = {
+  content: {
+    top: "10%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    width: "20%",
+    transform: "translate(-50%, -50%)",
+  },
+};
 interface Props {}
 export default class LiftManager extends Component<Props, State> {
   state = {
@@ -89,27 +105,37 @@ export default class LiftManager extends Component<Props, State> {
     ],
     calls: Array<number>(),
     currentlyMoving: 0,
+    err: "",
+    intervals: [],
     mat: createCellsMatrix(),
   };
-  componentDidUpdate(prevProps:any,prevState:State){
-    if(prevState.currentlyMoving===5 && this.state.currentlyMoving===4 && this.state.calls.length>0){
-      const calls=this.state.calls.slice(1);
-      this.setState({calls});
-      this.orderLift(this.state.calls[0])
+  componentDidUpdate(prevProps: any, prevState: State) {
+    if (//
+      prevState.currentlyMoving === 5 &&
+      this.state.currentlyMoving === 4 &&
+      this.state.calls.length > 0
+    ) {
+      const calls = this.state.calls.slice(1);
+      this.setState({ calls });
+      this.orderLift(this.state.calls[0]);
       console.log(prevState);
-      
     }
   }
-  componentDidMount() {
-    // setTimeout(()=> {
-    //   const lifts =this.state.lifts.slice();
-    //   lifts[4]= {...lifts[4],floor:5,from:0,to:5,transitionTime:5,color:'green',called:true}
-    //   this.setState({
-    //     lifts
-    //   })
-    // },2000)
-  }
 
+  checkIfLiftAlreadyHere = (floor: number) => {
+    const liftsHere = this.state.lifts.reduce(
+      (acc, lift) => (lift.floor === floor ? acc + 1 : acc),
+      0
+    );
+    if (liftsHere) {
+      this.setState({ err: `There are already ${liftsHere} lifts here` });
+      setTimeout(() => {
+        this.setState({ err: "" });
+      }, 3000);
+      return true;
+    }
+    return false;
+  };
   freeLiftAndFloor = (liftId: number, floorLevel: number) => {
     const lifts = this.state.lifts.slice();
     lifts[liftId] = {
@@ -140,12 +166,14 @@ export default class LiftManager extends Component<Props, State> {
     }, 2000);
   };
 
+
   startChange = (to: number, from: number, liftId: number) => {
     if (to === from) return;
-
+    //number of lifts currently moving
     this.setState((prev) => {
       return { currentlyMoving: prev.currentlyMoving + 1 };
     });
+    this.setTime(to,liftId,Math.abs(to - from));
     //lift moving
     const lift = this.state.lifts[liftId];
     const newLift = {
@@ -171,13 +199,18 @@ export default class LiftManager extends Component<Props, State> {
 
   orderLift = (floor: number) => {
     console.log(floor, "floor");
-     //button block
-     const btns = this.state.floors.slice();
-     const newBtn = { ...btns[floor], status: "waiting" };
-     btns[floor] = newBtn;
-     this.setState({  floors: btns });
 
-    const availableLifts = this.state.lifts.filter((l) => !l.called);
+    if (this.checkIfLiftAlreadyHere(floor)){
+      return ;
+    }
+    //button block
+    const btns = this.state.floors.slice();
+    const newBtn = { ...btns[floor], status: "waiting" };
+    btns[floor] = newBtn;
+    this.setState({ floors: btns });
+   
+  
+      const availableLifts = this.state.lifts.filter((l) => !l.called);
     if (availableLifts.length === 0) {
       this.state.calls.push(floor);
     } else if (availableLifts.length === 1) {
@@ -191,6 +224,12 @@ export default class LiftManager extends Component<Props, State> {
       this.startChange(floor, closestLifts[0].from, closestLifts[0].id);
     }
   };
+  setTime=(floor:number,lift_id:number,time:number)=> {
+    console.log(`setTime, floor:[${floor}],lift[${lift_id}],time:${time}`);
+    const newMat = JSON.parse(JSON.stringify(this.state.mat));
+    newMat[9-floor][lift_id].time=time;
+    this.setState({mat:newMat});
+  }
 
   render() {
     return (
@@ -199,11 +238,12 @@ export default class LiftManager extends Component<Props, State> {
           <div
             className={classes.floor}
             key={floorLevel}
-            style={{ backgroundColor: "red", height: `${10}%` }}
+            style={{ backgroundColor: "transparent", height: `${10}%` }}
           >
             {row.map((cell) => (
               <FloorCell
                 {...cell}
+                setTime={this.setTime}
                 key={`${cell.floorLevel}-${cell.fromTheLeft}`}
               />
             ))}
@@ -216,6 +256,17 @@ export default class LiftManager extends Component<Props, State> {
         {this.state.lifts.map((lift) => (
           <Lift key={lift.id} {...lift} />
         ))}
+        {this.state.err && (
+          <Modal
+            isOpen={this.state.err.length > 0}
+            // onAfterOpen={}
+            // onRequestClose={closeModal}
+            style={customStyles}
+            contentLabel="Example Modal"
+          >
+            {this.state.err}
+          </Modal>
+        )}
       </div>
     );
   }
