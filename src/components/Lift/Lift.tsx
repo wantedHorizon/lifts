@@ -9,19 +9,46 @@ interface Props {
   called: boolean;
   transitionTime: number;
   color?: string;
+  liftsAmount: number;
+  floorsAmount: number;
+  width:number;
+  height:number;
 }
 
-export default function Lift(props: Props) {
+export default function Lift({ id,
+  floor,
+  from,
+  to,
+  called,
+  transitionTime,
+  color,
+  liftsAmount,
+  height,
+  width,
+  floorsAmount}: Props) {
   let icon = lift;
-  if (props.color === "green") {
+  if (color === "green") {
     icon = liftGreen;
-  } else if (props.color === "red") {
+  } else if (color === "red") {
     icon = liftRed;
   }
+
+
+  
   return (
     <div
       className="lift"
-      style={{ bottom: `${10 * props.floor}%`, left: `${5 + props.id * 16.5}%`,transition:`bottom ${Math.abs(props.from-props.to)}s` }}
+      style={{
+        height:`${height}%`,
+        width:`${width}%`,
+        bottom: `${height *floor}%`,
+        left: `${
+          width*id
+        }%`,
+        transition: `bottom ${Math.abs(from - to)}s`,
+        // backgroundColor:'red'
+        // transform:'translate(-50%)'
+      }}
     >
       <img src={icon} alt="lift" />
     </div>

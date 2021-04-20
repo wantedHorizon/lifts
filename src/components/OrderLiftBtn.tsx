@@ -4,17 +4,12 @@ import { Button } from "@material-ui/core";
 interface Props {
   data: any;
   orderLift: () => void;
+  width:number;
+  height:number;
 }
 
-const style = {
-  width: "19%",
-  justifyContent: "center",
-  alignItems: "center",
-  display: "flex",
-  border: "0.05px solid rgba(0,0,0,0.2)",
-};
 
-export default function OrderLiftBtn({ data, orderLift }: Props) {
+export default function OrderLiftBtn({ data, orderLift,width }: Props) {
   const onClickHandler = () => {
     if (data.status !== "call") {
       return;
@@ -22,6 +17,15 @@ export default function OrderLiftBtn({ data, orderLift }: Props) {
     orderLift();
   };
 
+  
+
+  const style = {
+    width: `${width}%`,
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    border: "0.05px solid rgba(0,0,0,0.2)",
+  };
   let backgroundColor = "green";
   let borderColor = "transparent";
   let color = "white";

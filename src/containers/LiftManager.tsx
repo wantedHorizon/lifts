@@ -4,22 +4,14 @@ import Lift from "../components/Lift/Lift";
 import OrderLiftBtn from "../components/OrderLiftBtn";
 import classes from "./LiftManager.module.css";
 import Modal from "react-modal";
-const createCellsMatrix = (): any[][] => {
-  const mat = [];
-  for (let floorLevel = 0; floorLevel < 10; floorLevel++) {
-    const floor = [];
-    for (let lifts = 0; lifts < 5; lifts++) {
-      floor.push({
-        floorLevel,
-        fromTheLeft: lifts,
-        text: "",
-        time:0
-      });
-    }
-    mat.push(floor);
-  }
-  return mat;
-};
+import {
+  FLOORS_AMOUNT,
+  LIFTS,
+  createCellsMatrix,
+  floorsArrayCreator,
+  liftsArrayCreator,
+} from "../utils/utils";
+
 interface State {
   lifts: any[];
   floors: any[];
@@ -27,7 +19,7 @@ interface State {
   mat: any[][];
   currentlyMoving: number;
   err: string;
-  intervals:any[];
+  intervals: any[];
 }
 
 const customStyles = {
@@ -44,65 +36,8 @@ const customStyles = {
 interface Props {}
 export default class LiftManager extends Component<Props, State> {
   state = {
-    lifts: [
-      {
-        id: 0,
-        floor: 0,
-        from: 0,
-        to: 0,
-        called: false,
-        transitionTime: 1,
-        color: "",
-      },
-      {
-        id: 1,
-        floor: 0,
-        from: 0,
-        to: 0,
-        called: false,
-        transitionTime: 1,
-        color: "",
-      },
-      {
-        id: 2,
-        floor: 0,
-        from: 0,
-        to: 0,
-        called: false,
-        transitionTime: 1,
-        color: "",
-      },
-      {
-        id: 3,
-        floor: 0,
-        from: 0,
-        to: 0,
-        called: false,
-        transitionTime: 1,
-        color: "",
-      },
-      {
-        id: 4,
-        floor: 0,
-        from: 0,
-        to: 0,
-        called: false,
-        transitionTime: 1,
-        color: "",
-      },
-    ],
-    floors: [
-      { level: 9, status: "call" },
-      { level: 8, status: "call" },
-      { level: 7, status: "call" },
-      { level: 6, status: "call" },
-      { level: 5, status: "call" },
-      { level: 4, status: "call" },
-      { level: 3, status: "call" },
-      { level: 2, status: "call" },
-      { level: 1, status: "call" },
-      { level: 0, status: "call" },
-    ],
+    lifts: liftsArrayCreator(),
+    floors: floorsArrayCreator(),
     calls: Array<number>(),
     currentlyMoving: 0,
     err: "",
@@ -110,9 +45,10 @@ export default class LiftManager extends Component<Props, State> {
     mat: createCellsMatrix(),
   };
   componentDidUpdate(prevProps: any, prevState: State) {
-    if (//
-      prevState.currentlyMoving === 5 &&
-      this.state.currentlyMoving === 4 &&
+    if (
+      //
+      prevState.currentlyMoving === LIFTS &&
+      this.state.currentlyMoving === LIFTS-1 &&
       this.state.calls.length > 0
     ) {
       const calls = this.state.calls.slice(1);
@@ -166,14 +102,13 @@ export default class LiftManager extends Component<Props, State> {
     }, 2000);
   };
 
-
   startChange = (to: number, from: number, liftId: number) => {
     if (to === from) return;
     //number of lifts currently moving
     this.setState((prev) => {
       return { currentlyMoving: prev.currentlyMoving + 1 };
     });
-    this.setTime(to,liftId,Math.abs(to - from));
+    this.setTime(to, liftId, Math.abs(to - from));
     //lift moving
     const lift = this.state.lifts[liftId];
     const newLift = {
@@ -200,17 +135,16 @@ export default class LiftManager extends Component<Props, State> {
   orderLift = (floor: number) => {
     console.log(floor, "floor");
 
-    if (this.checkIfLiftAlreadyHere(floor)){
-      return ;
+    if (this.checkIfLiftAlreadyHere(floor)) {
+      return;
     }
     //button block
     const btns = this.state.floors.slice();
     const newBtn = { ...btns[floor], status: "waiting" };
     btns[floor] = newBtn;
     this.setState({ floors: btns });
-   
-  
-      const availableLifts = this.state.lifts.filter((l) => !l.called);
+
+    const availableLifts = this.state.lifts.filter((l) => !l.called);
     if (availableLifts.length === 0) {
       this.state.calls.push(floor);
     } else if (availableLifts.length === 1) {
@@ -224,12 +158,12 @@ export default class LiftManager extends Component<Props, State> {
       this.startChange(floor, closestLifts[0].from, closestLifts[0].id);
     }
   };
-  setTime=(floor:number,lift_id:number,time:number)=> {
+  setTime = (floor: number, lift_id: number, time: number) => {
     console.log(`setTime, floor:[${floor}],lift[${lift_id}],time:${time}`);
     const newMat = JSON.parse(JSON.stringify(this.state.mat));
-    newMat[9-floor][lift_id].time=time;
-    this.setState({mat:newMat});
-  }
+    newMat[FLOORS_AMOUNT - 1 - floor][lift_id].time = time;
+    this.setState({ mat: newMat });
+  };
 
   render() {
     return (
@@ -238,23 +172,37 @@ export default class LiftManager extends Component<Props, State> {
           <div
             className={classes.floor}
             key={floorLevel}
-            style={{ backgroundColor: "transparent", height: `${10}%` }}
+            style={{
+              backgroundColor: "transparent",
+              height: `${100 / FLOORS_AMOUNT}%`,
+            }}
           >
             {row.map((cell) => (
               <FloorCell
+                width={Math.floor(100 / (LIFTS + 1))}
+                height={Math.floor(100 / FLOORS_AMOUNT)}
                 {...cell}
                 setTime={this.setTime}
                 key={`${cell.floorLevel}-${cell.fromTheLeft}`}
               />
             ))}
             <OrderLiftBtn
-              data={this.state.floors[9 - floorLevel]}
-              orderLift={() => this.orderLift(9 - floorLevel)}
+              width={Math.floor(100 / (LIFTS + 1))}
+              height={Math.floor(100 / FLOORS_AMOUNT)}
+              data={this.state.floors[FLOORS_AMOUNT - 1 - floorLevel]}
+              orderLift={() => this.orderLift(FLOORS_AMOUNT - 1 - floorLevel)}
             />
           </div>
         ))}
         {this.state.lifts.map((lift) => (
-          <Lift key={lift.id} {...lift} />
+          <Lift
+            key={lift.id}
+            floorsAmount={FLOORS_AMOUNT}
+            liftsAmount={LIFTS}
+            {...lift}
+            width={Math.floor(100 / (LIFTS + 1))}
+            height={Math.floor(100 / FLOORS_AMOUNT)}
+          />
         ))}
         {this.state.err && (
           <Modal

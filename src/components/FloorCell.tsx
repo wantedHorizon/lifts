@@ -5,6 +5,8 @@ interface Props {
   fromTheLeft: number;
   text: string;
   time: number;
+  width:number;
+  height:number;
   setTime: (floor: number, lift_id: number, time: number) => void;
 }
 export default function FloorCell(props: Props) {
@@ -35,7 +37,7 @@ export default function FloorCell(props: Props) {
   return (
     <div
       style={{
-        width: "16.5%",
+        width: `${props.width}%`,
         height: "100%",
         backgroundColor: "white",
         fontSize:'14px',
