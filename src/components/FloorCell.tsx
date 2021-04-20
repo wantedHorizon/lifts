@@ -39,7 +39,7 @@ export default function FloorCell(props: Props) {
         height: "100%",
         backgroundColor: "white",
         fontSize:'14px',
-        border: "0.5px solid black",
+        border: "0.05px solid rgba(0,0,0,0.2)",
         color:'black',
         justifyContent:'center',
         alignItems:'center',

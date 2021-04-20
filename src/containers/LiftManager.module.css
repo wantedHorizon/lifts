@@ -3,8 +3,9 @@
     width:100%;
     position: relative;
     border-radius: 10px;
-    background-color: red;
 }
+
+
 
 .floor {
     display: flex;
