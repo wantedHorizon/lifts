@@ -169,11 +169,13 @@ export default class LiftManager extends Component<Props, State> {
     } else if (availableLifts.length === 1) {
       this.startChange(floor, availableLifts[0].floor, availableLifts[0].id);
     } else {
-      const closestLifts = availableLifts.sort((l) => Math.abs(floor - l.from));
+      const closestLifts = availableLifts.sort((l) => Math.abs(floor - l.floor));
       if (closestLifts[0].floor === floor) {
         console.log("lift already here");
         return;
       }
+      console.log("closestLifts",closestLifts);
+      
       this.startChange(floor, closestLifts[0].from, closestLifts[0].id);
     }
   };
