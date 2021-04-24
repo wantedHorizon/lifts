@@ -5,7 +5,6 @@ import OrderLiftBtn from "../components/OrderLiftBtn";
 import classes from "./LiftManager.module.css";
 import Modal from "react-modal";
 import {
-
   createCellsMatrix,
   floorsArrayCreator,
   liftsArrayCreator,
@@ -39,7 +38,6 @@ const customStyles = {
 };
 
 export default class LiftManager extends Component<Props, State> {
- 
   state = {
     lifts: liftsArrayCreator(),
     floors: floorsArrayCreator(),
@@ -169,14 +167,18 @@ export default class LiftManager extends Component<Props, State> {
     } else if (availableLifts.length === 1) {
       this.startChange(floor, availableLifts[0].floor, availableLifts[0].id);
     } else {
-      const closestLifts = availableLifts.sort((l) => Math.abs(floor - l.floor));
+      const closestLifts = availableLifts.sort((a,b) => {
+       const diff1= Math.abs(floor - a.floor);
+       const diff2= Math.abs(floor - b.floor);
+       return diff1-diff2;
+      });
       if (closestLifts[0].floor === floor) {
         console.log("lift already here");
         return;
       }
-      console.log("closestLifts",closestLifts);
-      
-      this.startChange(floor, closestLifts[0].from, closestLifts[0].id);
+      console.log("closestLifts", closestLifts);
+
+      this.startChange(floor, closestLifts[0].floor, closestLifts[0].id);
     }
   };
   setTime = (floor: number, lift_id: number, time: number) => {
@@ -224,7 +226,7 @@ export default class LiftManager extends Component<Props, State> {
             liftsAmount={this.props.Lifts}
             {...lift}
             width={Math.floor(100 / (this.props.Lifts + 1))}
-            height={(100 / this.props.floorsAmount)}
+            height={100 / this.props.floorsAmount}
           />
         ))}
         {this.state.err && (
